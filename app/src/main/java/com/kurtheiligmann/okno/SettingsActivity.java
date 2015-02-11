@@ -34,16 +34,15 @@ public class SettingsActivity extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
+        SMSListener.setContext(this);
         Preference enablePreference = findPreference(getResources().getString(R.string.pref_key_enable_okno));
         boolean enabled = DataManager.getEnabled(this);
-        SMSListener.listenerEnabled = enabled;
         enablePreference.setDefaultValue(enabled);
         enablePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (newValue instanceof Boolean) {
                     boolean enabled = (Boolean)newValue;
-                    SMSListener.listenerEnabled = enabled;
                     Log.i("enablePreference", "onPreferenceChange:" + newValue);
                     DataManager.saveEnabled(enabled, SettingsActivity.this);
                     if (enabled) {
