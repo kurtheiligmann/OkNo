@@ -7,6 +7,7 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import com.kurtheiligmann.okno.data.DataManager;
+import com.kurtheiligmann.okno.listener.SMSListener;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -34,12 +35,15 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
         Preference enablePreference = findPreference(getResources().getString(R.string.pref_key_enable_okno));
-        enablePreference.setDefaultValue(DataManager.getEnabled(this));
+        boolean enabled = DataManager.getEnabled(this);
+        SMSListener.listenerEnabled = enabled;
+        enablePreference.setDefaultValue(enabled);
         enablePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (newValue instanceof Boolean) {
                     boolean enabled = (Boolean)newValue;
+                    SMSListener.listenerEnabled = enabled;
                     Log.i("enablePreference", "onPreferenceChange:" + newValue);
                     DataManager.saveEnabled(enabled, SettingsActivity.this);
                     if (enabled) {
