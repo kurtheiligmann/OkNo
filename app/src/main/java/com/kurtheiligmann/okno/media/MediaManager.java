@@ -3,8 +3,7 @@ package com.kurtheiligmann.okno.media;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
-
-import com.kurtheiligmann.okno.R;
+import android.os.Handler;
 
 import java.util.HashMap;
 
@@ -55,10 +54,16 @@ public class MediaManager {
     }
 
     public void playSound(String smsText) {
-        String audioFilePath = getAudioFilesByText().get(smsText);
+        final String audioFilePath = getAudioFilesByText().get(smsText);
         if (audioFilePath != null) {
-            MediaPlayer player = MediaPlayer.create(getContext(), Uri.parse(audioFilePath));
-            player.start();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MediaPlayer player = MediaPlayer.create(getContext(), Uri.parse(audioFilePath));
+                    player.start();
+                }
+            }, 750);
         }
     }
 }
