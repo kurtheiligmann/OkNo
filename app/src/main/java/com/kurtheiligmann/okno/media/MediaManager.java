@@ -34,23 +34,39 @@ public class MediaManager {
     public MediaManager(Context context) {
         setAudioFilesByText(new HashMap<String, String>());
         setContext(context);
+
+        getAudioFilesByText().put("y", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("Y", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("yes", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("Yes", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("YES", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+
         getAudioFilesByText().put("ok", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
-        getAudioFilesByText().put("OK", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
         getAudioFilesByText().put("oK", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("Ok", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("OK", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+
         getAudioFilesByText().put("k", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
-        getAudioFilesByText().put("kk", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
         getAudioFilesByText().put("K", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+
+        getAudioFilesByText().put("kk", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
         getAudioFilesByText().put("KK", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+        getAudioFilesByText().put("kK", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
         getAudioFilesByText().put("Kk", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
+
         getAudioFilesByText().put("okay", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
         getAudioFilesByText().put("Okay", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
         getAudioFilesByText().put("OKAY", "android.resource://com.kurtheiligmann.okno/raw/two_tone");
 
+        getAudioFilesByText().put("n", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
+        getAudioFilesByText().put("N", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
         getAudioFilesByText().put("no", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
         getAudioFilesByText().put("No", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
-        getAudioFilesByText().put("nope", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
         getAudioFilesByText().put("NO", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
         getAudioFilesByText().put("nO", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
+
+        getAudioFilesByText().put("nope", "android.resource://com.kurtheiligmann.okno/raw/no_tone");
+
     }
 
     public void playSound(String smsText) {
