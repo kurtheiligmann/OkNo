@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">OkNo</string>
+
+    <string-array name="default_positive_values">
+        <item>y</item>
+        <item>yes</item>
+        <item>ok</item>
+        <item>okay</item>
+        <item>k</item>
+        <item>kk</item>
+    </string-array>
+
+    <string-array name="default_negative_values">
+        <item>n</item>
+        <item>no</item>
+        <item>nope</item>
+    </string-array>
 </resources>
