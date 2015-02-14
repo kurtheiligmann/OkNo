@@ -3,7 +3,6 @@ package com.kurtheiligmann.okno;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import com.kurtheiligmann.okno.data.DataManager;
@@ -21,40 +20,29 @@ import com.kurtheiligmann.okno.listener.SMSListener;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity {
-    /**
-     * Determines whether to always show the simplified settings UI, where
-     * settings are presented in a single list. When false, settings are shown
-     * as a master/detail two-pane view on tablets. When true, a single pane is
-     * shown on tablets.
-     */
-    private static final boolean ALWAYS_SIMPLE_PREFS = true;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
+
         SMSListener.setContext(this);
         Preference enablePreference = findPreference(getResources().getString(R.string.pref_key_enable_okno));
-        boolean enabled = DataManager.getEnabled(this);
+
+        final DataManager dataManager = new DataManager(this);
+        boolean enabled = dataManager.getEnabled();
+
         enablePreference.setDefaultValue(enabled);
         enablePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (newValue instanceof Boolean) {
-                    boolean enabled = (Boolean)newValue;
+                    boolean enabled = (Boolean) newValue;
                     Log.i("enablePreference", "onPreferenceChange:" + newValue);
-                    DataManager.saveEnabled(enabled, SettingsActivity.this);
-                    if (enabled) {
-                        startOkNoService();
-                    }
+                    dataManager.saveEnabled(enabled);
                 }
                 return true;
             }
         });
-    }
-
-    private void startOkNoService() {
-
     }
 }
