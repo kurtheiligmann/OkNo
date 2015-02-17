@@ -6,4 +6,6 @@
     <string name="pref_title_enable_okno">Enable OkNo</string>
     <string name="pref_description_enable_okno">Turn on/off OkNo</string>
 
+    <string name="pref_key_word_list">word_list</string>
+    <string name="pref_title_word_list">Word List</string>
 </resources>
