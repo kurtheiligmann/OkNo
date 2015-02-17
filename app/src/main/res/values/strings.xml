@@ -15,4 +15,7 @@
         <item>no</item>
         <item>nope</item>
     </string-array>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>
