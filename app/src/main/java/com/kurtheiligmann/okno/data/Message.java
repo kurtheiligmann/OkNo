@@ -2,6 +2,8 @@ package com.kurtheiligmann.okno.data;
 
 import com.orm.SugarRecord;
 
+import java.io.File;
+
 /**
  * Created by kurtheiligmann on 2/11/15.
  */
@@ -15,6 +17,11 @@ public class Message extends SugarRecord<Message> {
     public Message(String body, String audioFilePath) {
         this.setBody(body);
         this.setAudioFilePath(audioFilePath);
+    }
+
+    public String getAudioFileName() {
+        File audioFile = new File(getAudioFilePath());
+        return audioFile.getName();
     }
 
     public String getBody() {
@@ -32,5 +39,4 @@ public class Message extends SugarRecord<Message> {
     public void setAudioFilePath(String audioFilePath) {
         this.audioFilePath = audioFilePath;
     }
-
 }

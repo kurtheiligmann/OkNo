@@ -1,6 +1,7 @@
 package com.kurtheiligmann.okno.controller.settings.fragment;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -79,6 +80,7 @@ public class SettingsFragment extends Fragment {
         Message selectedMessage = dataManager.getAllMessages().get(info.position);
         switch (item.getItemId()) {
             case R.id.edit_message:
+                showEditMessage(selectedMessage);
                 return true;
             case R.id.delete_message:
                 dataManager.deleteMessage(selectedMessage);
@@ -87,5 +89,13 @@ public class SettingsFragment extends Fragment {
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void showEditMessage(Message message) {
+        FragmentTransaction fragmentTransaction = getActivity().getFragmentManager().beginTransaction();
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.addToBackStack(EditMessageFragment.FRAGMENT_NAME);
+        fragmentTransaction.replace(R.id.container, EditMessageFragment.newInstance(message));
+        fragmentTransaction.commit();
     }
 }

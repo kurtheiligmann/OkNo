@@ -59,6 +59,16 @@ public class DataManager {
         return existingMessages;
     }
 
+    public Message getMessageWithBody(String body) {
+        Message message = null;
+        List<Message> foundMessages = Message.find(Message.class, "body = ?", body);
+        if (foundMessages.size() > 0) {
+            message = foundMessages.get(0);
+        }
+
+        return message;
+    }
+
     public void deleteMessage(Message message) {
         message.delete();
     }
