@@ -11,18 +11,18 @@ import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.Message;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by kurtheiligmann on 2/16/15.
  */
 public class MessageListAdapter extends ArrayAdapter<Message> {
     private final Context context;
-    private final Message[] messages;
 
-    public MessageListAdapter(Context context, int resource, Message[] messages) {
-        super(context, resource, messages);
+    public MessageListAdapter(Context context, int resource, List<Message> messages) {
+        super(context, resource);
         this.context = context;
-        this.messages = messages;
+        this.addAll(messages);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        Message message = messages[position];
+        Message message = getItem(position);
 
         View rowView = convertView;
 
@@ -46,5 +46,11 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         messageAudioTextView.setText(audioFile.getName());
 
         return rowView;
+    }
+
+    public void swapMessages(List<Message> messages) {
+        this.clear();
+        this.addAll(messages);
+        this.notifyDataSetChanged();
     }
 }

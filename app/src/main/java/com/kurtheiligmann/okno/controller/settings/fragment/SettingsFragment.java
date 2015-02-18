@@ -60,7 +60,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void populateMessageList(List<Message> messages, ListView messageList) {
-        messageListAdapter = new MessageListAdapter(getActivity(), R.layout.message_list_item, messages.toArray(new Message[messages.size()]));
+        messageListAdapter = new MessageListAdapter(getActivity(), R.layout.message_list_item, messages);
         messageList.setAdapter(messageListAdapter);
     }
 
@@ -82,6 +82,7 @@ public class SettingsFragment extends Fragment {
                 return true;
             case R.id.delete_message:
                 dataManager.deleteMessage(selectedMessage);
+                messageListAdapter.swapMessages(dataManager.getAllMessages());
                 return true;
             default:
                 return super.onContextItemSelected(item);
