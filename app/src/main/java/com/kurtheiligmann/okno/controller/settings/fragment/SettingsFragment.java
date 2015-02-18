@@ -75,10 +75,13 @@ public class SettingsFragment extends Fragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        DataManager dataManager = new DataManager(getActivity());
+        Message selectedMessage = dataManager.getAllMessages().get(info.position);
         switch (item.getItemId()) {
             case R.id.edit_message:
                 return true;
             case R.id.delete_message:
+                dataManager.deleteMessage(selectedMessage);
                 return true;
             default:
                 return super.onContextItemSelected(item);

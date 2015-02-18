@@ -59,6 +59,10 @@ public class DataManager {
         return existingMessages;
     }
 
+    public void deleteMessage(Message message) {
+        message.delete();
+    }
+
     private Context getContext() {
         return context;
     }
