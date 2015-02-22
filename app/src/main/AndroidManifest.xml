@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.kurtheiligmann.okno" >
+    package="com.kurtheiligmann.okno">
 
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.orm.SugarApp"
@@ -11,10 +12,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon" >
+        tools:replace="android:icon">
         <activity
             android:name=".controller.settings.activity.SettingsActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,15 +23,15 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".listener.SMSListener" >
+        <receiver android:name=".listener.SMSListener">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
 
         <!--<activity-->
-            <!--android:name=".activity.SettingsActivity"-->
-            <!--android:label="@string/title_activity_settings" >-->
+        <!--android:name=".activity.SettingsActivity"-->
+        <!--android:label="@string/title_activity_settings" >-->
         <!--</activity>-->
     </application>
 

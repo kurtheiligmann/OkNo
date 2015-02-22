@@ -1,7 +1,9 @@
 package com.kurtheiligmann.okno.controller.settings.fragment;
 
 import android.app.Fragment;
+import android.media.Ringtone;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.DataManager;
 import com.kurtheiligmann.okno.data.Message;
+import com.kurtheiligmann.okno.media.MediaManager;
 
 import java.util.List;
 
@@ -35,8 +38,15 @@ public class EditMessageFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            DataManager dataManager = new DataManager(getActivity());
             String messageBody = getArguments().getString(MESSAGE_ARG_KEY);
-            message = new DataManager(getActivity()).getMessageWithBody(messageBody);
+            message = dataManager.getMessageWithBody(messageBody);
+
+            MediaManager mediaManager = new MediaManager(getActivity());
+            List<Ringtone> ringtones = mediaManager.getAllRingtones();
+            for (Ringtone ringtone : ringtones) {
+                Log.i(this.getClass().toString(), "ringtone: " + ringtone.getTitle(getActivity()));
+            }
         }
     }
 

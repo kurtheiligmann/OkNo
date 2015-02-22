@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.Message;
 
-import java.io.File;
 import java.util.List;
 
 /**

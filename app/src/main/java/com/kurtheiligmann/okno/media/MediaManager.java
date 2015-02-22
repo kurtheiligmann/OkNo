@@ -1,11 +1,17 @@
 package com.kurtheiligmann.okno.media;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Handler;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by kurtheiligmann on 2/10/15.
@@ -81,5 +87,18 @@ public class MediaManager {
                 }
             }, 750);
         }
+    }
+
+    public List<Ringtone> getAllRingtones() {
+        ArrayList<Ringtone> ringtones = new ArrayList<Ringtone>();
+        RingtoneManager ringtoneManager = new RingtoneManager(getContext());
+        ringtoneManager.setType(RingtoneManager.TYPE_ALL);
+
+        int numberOfRingtones = ringtoneManager.getCursor().getCount();
+        for (int i = 0; i < numberOfRingtones; i++) {
+            ringtones.add(ringtoneManager.getRingtone(i));
+        }
+
+        return ringtones;
     }
 }
