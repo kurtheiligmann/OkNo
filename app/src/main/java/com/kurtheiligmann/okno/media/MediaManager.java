@@ -1,14 +1,16 @@
 package com.kurtheiligmann.okno.media;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Handler;
+import android.util.Log;
 
-import java.net.URI;
+import com.kurtheiligmann.okno.data.DataManager;
+import com.kurtheiligmann.okno.data.Tone;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,28 +77,28 @@ public class MediaManager {
 
     }
 
-    public void playSound(String smsText) {
-        final String audioFilePath = getAudioFilesByText().get(smsText);
-        if (audioFilePath != null) {
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    MediaPlayer player = MediaPlayer.create(getContext(), Uri.parse(audioFilePath));
-                    player.start();
-                }
-            }, 750);
-        }
+    public void playToneForMessageBody(String messageBody) {
+        final Tone tone = new DataManager(getContext()).getMessageWithBody(messageBody).getTone();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                MediaPlayer player = MediaPlayer.create(getContext(), Uri.parse(tone.getFileAddress()));
+                player.start();
+            }
+        }, 750);
     }
 
-    public List<Ringtone> getAllRingtones() {
-        ArrayList<Ringtone> ringtones = new ArrayList<Ringtone>();
+    public List<Tone> getAllTones() {
+        ArrayList<Tone> ringtones = new ArrayList<Tone>();
         RingtoneManager ringtoneManager = new RingtoneManager(getContext());
         ringtoneManager.setType(RingtoneManager.TYPE_ALL);
 
         int numberOfRingtones = ringtoneManager.getCursor().getCount();
         for (int i = 0; i < numberOfRingtones; i++) {
-            ringtones.add(ringtoneManager.getRingtone(i));
+            Ringtone ringtone = ringtoneManager.getRingtone(i);
+            Log.i(this.getClass().toString(), ringtoneManager.getRingtoneUri(i).toString());
+            ringtones.add(new Tone(ringtone.getTitle(getContext()), ringtoneManager.getRingtoneUri(i).toString()));
         }
 
         return ringtones;

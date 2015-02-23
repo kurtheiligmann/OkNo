@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.DataManager;
 import com.kurtheiligmann.okno.data.Message;
+import com.kurtheiligmann.okno.data.Tone;
 import com.kurtheiligmann.okno.media.MediaManager;
 
 import java.util.List;
@@ -43,9 +44,9 @@ public class EditMessageFragment extends Fragment {
             message = dataManager.getMessageWithBody(messageBody);
 
             MediaManager mediaManager = new MediaManager(getActivity());
-            List<Ringtone> ringtones = mediaManager.getAllRingtones();
-            for (Ringtone ringtone : ringtones) {
-                Log.i(this.getClass().toString(), "ringtone: " + ringtone.getTitle(getActivity()));
+            List<Tone> ringtones = mediaManager.getAllTones();
+            for (Tone ringtone : ringtones) {
+                Log.i(this.getClass().toString(), "ringtone: " + ringtone.getTitle());
             }
         }
     }
@@ -59,7 +60,7 @@ public class EditMessageFragment extends Fragment {
         bodyText.setText(message.getBody());
 
         TextView toneText = (TextView) view.findViewById(R.id.message_tone);
-        toneText.setText(message.getAudioFileName());
+        toneText.setText(message.getTone().getTitle());
 
         return view;
     }

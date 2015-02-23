@@ -2,6 +2,7 @@ package com.kurtheiligmann.okno.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import com.kurtheiligmann.okno.R;
 
@@ -43,13 +44,17 @@ public class DataManager {
     private void initDefaultSounds(Context context) {
         String[] defaultPositiveValues = context.getResources().getStringArray(R.array.default_positive_values);
         for (String defaultPositiveValue : defaultPositiveValues) {
-            Message message = new Message(defaultPositiveValue, DEFAULT_POSITIVE_SOUND);
+            Tone tone = new Tone("OkYes", DEFAULT_POSITIVE_SOUND);
+            tone.save();
+            Message message = new Message(defaultPositiveValue, tone);
             message.save();
         }
 
         String[] defaultNegativeValues = context.getResources().getStringArray(R.array.default_negative_values);
         for (String defaultNegativeValue : defaultNegativeValues) {
-            Message message = new Message(defaultNegativeValue, DEFAULT_NEGATIVE_SOUND);
+            Tone tone = new Tone("OkNo", DEFAULT_NEGATIVE_SOUND);
+            tone.save();
+            Message message = new Message(defaultNegativeValue, tone);
             message.save();
         }
     }

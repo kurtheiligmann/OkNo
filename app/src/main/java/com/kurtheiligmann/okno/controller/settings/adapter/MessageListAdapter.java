@@ -41,7 +41,7 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         messageTextView.setText(message.getBody());
 
         TextView messageAudioTextView = (TextView) rowView.findViewById(R.id.message_audio);
-        messageAudioTextView.setText(message.getAudioFileName());
+        messageAudioTextView.setText(message.getTone().getTitle());
 
         return rowView;
     }
