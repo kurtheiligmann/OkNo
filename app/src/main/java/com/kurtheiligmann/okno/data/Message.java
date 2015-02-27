@@ -17,6 +17,11 @@ public class Message extends SugarRecord<Message> {
         setTone(tone);
     }
 
+    @Override
+    public void save() {
+        getTone().save();
+        super.save();
+    }
     public String getBody() {
         return body;
     }
