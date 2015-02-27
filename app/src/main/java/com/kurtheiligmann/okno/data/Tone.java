@@ -9,6 +9,9 @@ public class Tone extends SugarRecord<Tone> {
     String title;
     String fileAddress;
 
+    public Tone() {
+    }
+
     public Tone(String title, String fileAddress) {
         setTitle(title);
         setFileAddress(fileAddress);
@@ -28,6 +31,21 @@ public class Tone extends SugarRecord<Tone> {
 
     public void setFileAddress(String fileAddress) {
         this.fileAddress = fileAddress;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        boolean equals = false;
+        if (o instanceof Tone) {
+            Tone otherTone = (Tone) o;
+            equals = getTitle().equals(otherTone.getTitle()) && getFileAddress().equals(otherTone.getFileAddress());
+        }
+        return equals;
+    }
+
+    @Override
+    public int hashCode() {
+        return getTitle().hashCode() * getFileAddress().hashCode();
     }
 
 }
