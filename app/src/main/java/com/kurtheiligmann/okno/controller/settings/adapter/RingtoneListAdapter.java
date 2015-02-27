@@ -1,7 +1,6 @@
 package com.kurtheiligmann.okno.controller.settings.adapter;
 
 import android.content.Context;
-import android.media.Ringtone;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,21 +9,22 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.kurtheiligmann.okno.R;
+import com.kurtheiligmann.okno.data.Tone;
 
 import java.util.List;
 
 /**
  * Created by kurtheiligmann on 2/16/15.
  */
-public class RingtoneListAdapter extends ArrayAdapter<Ringtone> {
+public class RingtoneListAdapter extends ArrayAdapter<Tone> {
     private final Context context;
-    private Ringtone selectedRingtone;
+    private Tone selectedTone;
 
-    public RingtoneListAdapter(Context context, int resource, Ringtone selectedRingtone, List<Ringtone> ringtones) {
+    public RingtoneListAdapter(Context context, int resource, Tone tone, List<Tone> tones) {
         super(context, resource);
         this.context = context;
-        this.selectedRingtone = selectedRingtone;
-        this.addAll(ringtones);
+        this.selectedTone = tone;
+        this.addAll(tones);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class RingtoneListAdapter extends ArrayAdapter<Ringtone> {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        Ringtone ringtone = getItem(position);
+        Tone tone = getItem(position);
 
         View rowView = convertView;
 
@@ -41,10 +41,10 @@ public class RingtoneListAdapter extends ArrayAdapter<Ringtone> {
         }
 
         TextView ringtoneTitleTextView = (TextView) rowView.findViewById(R.id.ringtone_title);
-        ringtoneTitleTextView.setText(ringtone.getTitle(getContext()));
+        ringtoneTitleTextView.setText(tone.getTitle());
 
         CheckBox ringtoneSelectedCheckBox = (CheckBox) rowView.findViewById(R.id.ringtone_selected);
-        ringtoneSelectedCheckBox.setChecked(ringtone == selectedRingtone);
+        ringtoneSelectedCheckBox.setChecked(tone == selectedTone);
 
         return rowView;
     }

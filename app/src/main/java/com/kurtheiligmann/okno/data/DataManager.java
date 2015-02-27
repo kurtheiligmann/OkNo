@@ -2,7 +2,6 @@ package com.kurtheiligmann.okno.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 
 import com.kurtheiligmann.okno.R;
 
@@ -45,7 +44,6 @@ public class DataManager {
         String[] defaultPositiveValues = context.getResources().getStringArray(R.array.default_positive_values);
         for (String defaultPositiveValue : defaultPositiveValues) {
             Tone tone = new Tone("OkYes", DEFAULT_POSITIVE_SOUND);
-            tone.save();
             Message message = new Message(defaultPositiveValue, tone);
             message.save();
         }
@@ -53,7 +51,6 @@ public class DataManager {
         String[] defaultNegativeValues = context.getResources().getStringArray(R.array.default_negative_values);
         for (String defaultNegativeValue : defaultNegativeValues) {
             Tone tone = new Tone("OkNo", DEFAULT_NEGATIVE_SOUND);
-            tone.save();
             Message message = new Message(defaultNegativeValue, tone);
             message.save();
         }
@@ -61,12 +58,20 @@ public class DataManager {
 
     public List<Message> getAllMessages() {
         List<Message> existingMessages = Message.listAll(Message.class);
+        for (Message message : existingMessages) {
+            if (message.getTone() == null) {
+                List<Tone> messageTones = Tone.find(Tone.class, "message = ?", message.getId() + "");
+                if (messageTones.size() > 0) {
+                    message.setTone(messageTones.get(0));
+                }
+            }
+        }
         return existingMessages;
     }
 
     public Message getMessageWithBody(String body) {
         Message message = null;
-        List<Message> foundMessages = Message.find(Message.class, "body = ?", body);
+        List<Message> foundMessages = Message.find(Message.class, "body = ?", body.toLowerCase());
         if (foundMessages.size() > 0) {
             message = foundMessages.get(0);
         }
