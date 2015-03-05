@@ -118,7 +118,7 @@ public class DataManager extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Message message = messageFromCursor(cursor);
+            Message message = new Message(cursor, getTone(cursor.getLong(2)));
             existingMessages.add(message);
             cursor.moveToNext();
         }
@@ -161,7 +161,7 @@ public class DataManager extends SQLiteOpenHelper {
         try {
             Cursor cursor = getDatabase().query(Message.TABLE_NAME, Message.ALL_COLUMNS, Message.COLUMN_ID + "=" + messageId, null, null, null, null);
             cursor.moveToFirst();
-            message = messageFromCursor(cursor);
+            message = new Message(cursor, getTone(cursor.getLong(2)));
             cursor.close();
         } catch (SQLiteException e) {
             Log.e(this.getClass().getName(), e.getLocalizedMessage());
@@ -170,14 +170,14 @@ public class DataManager extends SQLiteOpenHelper {
         return message;
     }
 
-    private Message messageFromCursor(Cursor cursor) {
-        long messageId = cursor.getLong(0);
-        String body = cursor.getString(1);
-        Tone tone = getTone(cursor.getInt(2));
-        Message message = new Message(messageId, body, tone);
-
-        return message;
-    }
+//    private Message messageFromCursor(Cursor cursor) {
+//        long messageId = cursor.getLong(0);
+//        String body = cursor.getString(1);
+//        Tone tone = getTone(cursor.getInt(2));
+//        Message message = new Message(messageId, body, tone);
+//
+//        return message;
+//    }
 
     public void saveMessage(Message message) {
         ContentValues values = new ContentValues();
@@ -209,11 +209,13 @@ public class DataManager extends SQLiteOpenHelper {
 
     public Message getMessageWithBody(String body) {
         Message message = null;
-//        List<Message> foundMessages = Message.find(Message.class, "body = ?", body.toLowerCase());
-//        if (foundMessages.size() > 0) {
-//            message = foundMessages.get(0);
-//        }
 
+        Cursor cursor = getDatabase().query(Message.TABLE_NAME, Message.ALL_COLUMNS, Message.COLUMN_BODY+ "=?", new String[]{body}, null, null, null);
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            message = new Message(cursor, getTone(cursor.getLong(2)));
+        }
+        cursor.close();
         return message;
     }
 

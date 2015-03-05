@@ -33,6 +33,12 @@ public class Message {
         setTone(tone);
     }
 
+    public Message(Cursor cursor, Tone tone) {
+        setId(cursor.getLong(0));
+        setBody(cursor.getString(1));
+        setTone(tone);
+    }
+
     public long getId() {
         return id;
     }
