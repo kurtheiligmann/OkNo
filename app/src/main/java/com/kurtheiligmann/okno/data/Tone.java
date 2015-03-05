@@ -1,5 +1,7 @@
 package com.kurtheiligmann.okno.data;
 
+import android.database.Cursor;
+
 import com.orm.SugarRecord;
 
 /**
@@ -31,6 +33,12 @@ public class Tone {
         setId(-1);
         setTitle(title);
         setFileAddress(fileAddress);
+    }
+
+    public Tone(Cursor cursor) {
+        setId(cursor.getLong(0));
+        setTitle(cursor.getString(1));
+        setFileAddress(cursor.getString(2));
     }
 
     public String getTitle() {
