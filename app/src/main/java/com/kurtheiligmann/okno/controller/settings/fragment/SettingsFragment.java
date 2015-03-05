@@ -57,6 +57,7 @@ public class SettingsFragment extends Fragment {
             populateMessageList(dataManager.getAllMessages(), (ListView) rootView.findViewById(R.id.messages_list));
         }
 
+        dataManager.close();
         return rootView;
     }
 
@@ -78,17 +79,25 @@ public class SettingsFragment extends Fragment {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         DataManager dataManager = new DataManager(getActivity());
         Message selectedMessage = dataManager.getAllMessages().get(info.position);
+        boolean handled = false;
         switch (item.getItemId()) {
             case R.id.edit_message:
                 showEditMessage(selectedMessage);
-                return true;
+                handled = true;
+                break;
             case R.id.delete_message:
                 dataManager.deleteMessage(selectedMessage);
                 messageListAdapter.swapMessages(dataManager.getAllMessages());
-                return true;
+                handled = true;
+                break;
             default:
-                return super.onContextItemSelected(item);
+                handled = super.onContextItemSelected(item);
+                break;
         }
+
+        dataManager.close();
+
+        return handled;
     }
 
     private void showEditMessage(Message message) {

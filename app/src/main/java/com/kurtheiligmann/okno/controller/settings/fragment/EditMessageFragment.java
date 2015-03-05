@@ -48,6 +48,8 @@ public class EditMessageFragment extends Fragment {
             for (Tone ringtone : ringtones) {
                 Log.i(this.getClass().toString(), "ringtone: " + ringtone.getTitle());
             }
+
+            dataManager.close();
         }
     }
 
