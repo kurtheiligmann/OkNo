@@ -7,12 +7,14 @@ import android.view.MenuItem;
 
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.controller.settings.fragment.SettingsFragment;
+import com.kurtheiligmann.okno.listener.SMSListener;
 
 public class SettingsActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SMSListener.setContext(this);
         setContentView(R.layout.activity_settings);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
