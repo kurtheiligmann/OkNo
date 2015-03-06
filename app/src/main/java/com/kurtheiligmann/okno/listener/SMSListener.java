@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
@@ -23,13 +24,12 @@ public class SMSListener extends BroadcastReceiver {
     }
 
     private static Context context;
-    private static final String SMS_RECEIVED_ACTION = "android.provider.Telephony.SMS_RECEIVED";
     private static final String PDUS_BUNDLE_NAME = "pdus";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         boolean listenerEnabled = new DataManager(context).getEnabled();
-        if (listenerEnabled && intent.getAction().equals(SMS_RECEIVED_ACTION)) {
+        if (listenerEnabled && intent.getAction().equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 Object[] pdus = (Object[]) bundle.get(PDUS_BUNDLE_NAME);
@@ -39,7 +39,7 @@ public class SMSListener extends BroadcastReceiver {
                     messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
                     String msgBody = messages[i].getMessageBody();
-                    mediaManager.playToneForMessageBody(msgBody);
+                    mediaManager.playToneForMessageBody(msgBody.toLowerCase());
                     Log.i("SMSListener", "message: " + msgBody);
                 }
             }
