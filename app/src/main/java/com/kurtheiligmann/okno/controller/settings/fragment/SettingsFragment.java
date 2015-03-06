@@ -102,9 +102,9 @@ public class SettingsFragment extends Fragment {
 
     private void showEditMessage(Message message) {
         FragmentTransaction fragmentTransaction = getActivity().getFragmentManager().beginTransaction();
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        fragmentTransaction.addToBackStack(EditMessageFragment.FRAGMENT_NAME);
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         fragmentTransaction.replace(R.id.container, EditMessageFragment.newInstance(message));
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 }
