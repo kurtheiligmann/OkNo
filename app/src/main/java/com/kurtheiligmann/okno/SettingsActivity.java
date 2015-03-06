@@ -1,12 +1,16 @@
 package com.kurtheiligmann.okno;
 
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
 import com.kurtheiligmann.okno.data.DataManager;
+import com.kurtheiligmann.okno.data.Message;
 import com.kurtheiligmann.okno.listener.SMSListener;
+
+import java.util.List;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -44,5 +48,14 @@ public class SettingsActivity extends PreferenceActivity {
                 return true;
             }
         });
+
+        ListPreference wordList = (ListPreference) findPreference("word_list");
+        List<Message> allMessages = dataManager.getAllMessages();
+        CharSequence[] messageTextValues = new CharSequence[allMessages.size()];
+        for (int i = 0; i < allMessages.size(); i++) {
+            messageTextValues[i] = allMessages.get(i).getBody();
+        }
+        wordList.setEntryValues(messageTextValues);
+
     }
 }

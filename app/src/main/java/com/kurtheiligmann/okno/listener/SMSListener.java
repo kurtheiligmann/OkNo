@@ -39,7 +39,7 @@ public class SMSListener extends BroadcastReceiver {
                     messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
                     String msgBody = messages[i].getMessageBody();
-                    mediaManager.playSound(msgBody);
+                    mediaManager.playToneForMessageBody(msgBody);
                     Log.i("SMSListener", "message: " + msgBody);
                 }
             }
