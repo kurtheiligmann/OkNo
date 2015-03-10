@@ -28,13 +28,15 @@ public class SMSListener extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        boolean listenerEnabled = new DataManager(context).getEnabled();
+        DataManager dataManager = new DataManager(context);
+        boolean listenerEnabled = dataManager.getEnabled();
+        dataManager.close();
         if (listenerEnabled && intent.getAction().equals(SMS_RECEIVED_ACTION)) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 Object[] pdus = (Object[]) bundle.get(PDUS_BUNDLE_NAME);
                 SmsMessage[] messages = new SmsMessage[pdus.length];
-                MediaManager mediaManager = new MediaManager(SMSListener.getContext());
+                MediaManager mediaManager = new MediaManager(context);
                 for (int i = 0; i < messages.length; i++) {
                     messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 

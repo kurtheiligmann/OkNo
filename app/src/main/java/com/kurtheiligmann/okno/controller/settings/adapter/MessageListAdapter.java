@@ -9,13 +9,9 @@ import android.widget.TextView;
 
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.Message;
-import com.kurtheiligmann.okno.data.Tone;
 
 import java.util.List;
 
-/**
- * Created by kurtheiligmann on 2/16/15.
- */
 public class MessageListAdapter extends ArrayAdapter<Message> {
     private final Context context;
 
@@ -41,9 +37,8 @@ public class MessageListAdapter extends ArrayAdapter<Message> {
         TextView messageTextView = (TextView) rowView.findViewById(R.id.message_text);
         messageTextView.setText(message.getBody());
 
-        Tone messageTone = message.getTone();
         TextView messageAudioTextView = (TextView) rowView.findViewById(R.id.message_audio);
-        messageAudioTextView.setText(messageTone.getTitle());
+        messageAudioTextView.setText(message.getRingtoneName());
 
         return rowView;
     }
