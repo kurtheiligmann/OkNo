@@ -20,17 +20,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MediaManager {
 
-    private static final String SD_CARD_RINGTONE_PATH = Environment.getExternalStorageDirectory().getPath() +  "/media/audio/ringtones/";
-
     public static final String DEFAULT_POSITIVE_TITLE = "OkYes";
     public static final String DEFAULT_NEGATIVE_TITLE = "OkNo";
-
+    private static final String SD_CARD_RINGTONE_PATH = Environment.getExternalStorageDirectory().getPath() + "/media/audio/ringtones/";
     private Context context;
+
+    public MediaManager(Context context) {
+        setContext(context);
+    }
 
     private Context getContext() {
         return context;
@@ -40,12 +41,10 @@ public class MediaManager {
         this.context = context;
     }
 
-    public MediaManager(Context context) {
-        setContext(context);
-    }
-
     public void playToneForMessageBody(String messageBody) {
-        Message message = new DataManager(getContext()).getMessageWithBody(messageBody.toLowerCase());
+        DataManager dataManager = new DataManager(getContext());
+        Message message = dataManager.getMessageWithBody(messageBody.toLowerCase());
+        dataManager.close();
         if (message != null) {
             Ringtone ringtone = getRingtoneForName(message.getRingtoneName());
             if (ringtone != null) {
@@ -119,10 +118,10 @@ public class MediaManager {
                 if (!file.exists()) {
                     file.createNewFile();
                 }
-                FileOutputStream save = new FileOutputStream(file);
-                save.write(buffer);
-                save.flush();
-                save.close();
+                FileOutputStream out = new FileOutputStream(file);
+                out.write(buffer);
+                out.flush();
+                out.close();
             } catch (FileNotFoundException e) {
                 Log.e(this.getClass().getName(), e.getLocalizedMessage());
             } catch (IOException e) {
@@ -139,8 +138,8 @@ public class MediaManager {
             values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/m4a");
             values.put(MediaStore.Audio.Media.ARTIST, "okno ");
             values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-            values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
-            values.put(MediaStore.Audio.Media.IS_ALARM, true);
+            values.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
+            values.put(MediaStore.Audio.Media.IS_ALARM, false);
             values.put(MediaStore.Audio.Media.IS_MUSIC, false);
 
             getContext().getContentResolver().insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), values);

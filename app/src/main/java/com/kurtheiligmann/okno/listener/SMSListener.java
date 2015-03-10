@@ -28,7 +28,9 @@ public class SMSListener extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        boolean listenerEnabled = new DataManager(context).getEnabled();
+        DataManager dataManager = new DataManager(context);
+        boolean listenerEnabled = dataManager.getEnabled();
+        dataManager.close();
         if (listenerEnabled && intent.getAction().equals(SMS_RECEIVED_ACTION)) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {

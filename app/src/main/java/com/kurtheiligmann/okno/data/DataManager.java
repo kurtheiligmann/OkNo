@@ -50,7 +50,9 @@ public class DataManager extends SQLiteOpenHelper {
     }
 
     public void close() {
-        database.close();
+        if (getDatabase() != null) {
+            getDatabase().close();
+        }
     }
 
     @Override
