@@ -7,7 +7,6 @@ import android.view.MenuItem;
 
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.controller.settings.fragment.SettingsFragment;
-import com.kurtheiligmann.okno.listener.SMSListener;
 
 public class SettingsActivity extends ActionBarActivity {
 
