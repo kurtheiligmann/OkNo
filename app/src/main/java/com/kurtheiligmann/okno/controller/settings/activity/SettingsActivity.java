@@ -14,7 +14,6 @@ public class SettingsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SMSListener.setContext(this);
         setContentView(R.layout.activity_settings);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()

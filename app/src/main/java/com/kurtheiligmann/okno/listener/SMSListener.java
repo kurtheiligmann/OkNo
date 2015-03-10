@@ -13,15 +13,6 @@ import com.kurtheiligmann.okno.media.MediaManager;
 
 public class SMSListener extends BroadcastReceiver {
     private static final String PDUS_BUNDLE_NAME = "pdus";
-    private static Context context;
-
-    public static Context getContext() {
-        return context;
-    }
-
-    public static void setContext(Context context) {
-        SMSListener.context = context;
-    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
