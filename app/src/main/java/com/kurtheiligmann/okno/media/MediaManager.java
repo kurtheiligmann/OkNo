@@ -1,26 +1,37 @@
 package com.kurtheiligmann.okno.media;
 
+import android.content.ContentValues;
 import android.content.Context;
-import android.media.MediaPlayer;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Handler;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
+import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.DataManager;
 import com.kurtheiligmann.okno.data.Message;
-import com.kurtheiligmann.okno.data.Tone;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by kurtheiligmann on 2/10/15.
- */
 public class MediaManager {
 
+    public static final String DEFAULT_POSITIVE_TITLE = "OkYes";
+    public static final String DEFAULT_NEGATIVE_TITLE = "OkNo";
+    private static final String SD_CARD_RINGTONE_PATH = Environment.getExternalStorageDirectory().getPath() + "/media/audio/ringtones/";
     private Context context;
+
+    public MediaManager(Context context) {
+        setContext(context);
+    }
 
     private Context getContext() {
         return context;
@@ -30,30 +41,20 @@ public class MediaManager {
         this.context = context;
     }
 
-    public MediaManager(Context context) {
-        setContext(context);
-    }
-
     public void playToneForMessageBody(String messageBody) {
-        Message message = new DataManager(getContext()).getMessageWithBody(messageBody);
+        DataManager dataManager = new DataManager(getContext());
+        Message message = dataManager.getMessageWithBody(messageBody.toLowerCase());
+        dataManager.close();
         if (message != null) {
-            final Tone tone = message.getTone();
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Uri toneUri = Uri.parse(tone.getFileAddress());
-                    MediaPlayer player = MediaPlayer.create(getContext(), toneUri);
-                    player.start();
-
-
-                }
-            }, 750);
+            Ringtone ringtone = getRingtoneForName(message.getRingtoneName());
+            if (ringtone != null) {
+                ringtone.play();
+            }
         }
     }
 
-    public List<Tone> getAllTones() {
-        ArrayList<Tone> tones = new ArrayList<>();
+    public List<Ringtone> getAllTones() {
+        ArrayList<Ringtone> tones = new ArrayList<>();
         RingtoneManager ringtoneManager = new RingtoneManager(getContext());
         ringtoneManager.setType(RingtoneManager.TYPE_ALL);
 
@@ -61,9 +62,87 @@ public class MediaManager {
         for (int i = 0; i < numberOfRingtones; i++) {
             Ringtone ringtone = ringtoneManager.getRingtone(i);
             Log.i(this.getClass().toString(), ringtoneManager.getRingtoneUri(i).toString());
-            tones.add(new Tone(ringtone.getTitle(getContext()), ringtoneManager.getRingtoneUri(i).toString()));
+            tones.add(ringtone);
         }
 
         return tones;
+    }
+
+    public Ringtone getRingtoneForName(String name) {
+        Ringtone foundRingtone = null;
+        Ringtone defaultRingtone = null;
+        List<Ringtone> allTones = getAllTones();
+        for (Ringtone ringtone : allTones) {
+            String ringtoneTitle = ringtone.getTitle(getContext());
+            if (ringtoneTitle.equals(name)) {
+                foundRingtone = ringtone;
+                break;
+            } else if (ringtoneTitle.equals(DEFAULT_POSITIVE_TITLE)) {
+                defaultRingtone = ringtone;
+            }
+        }
+
+        if (foundRingtone == null) {
+            foundRingtone = defaultRingtone;
+        }
+
+        return foundRingtone;
+    }
+
+    public void createOkNoRingtones() {
+        int[] soundResourceIds = new int[]{R.raw.two_tone, R.raw.no_tone};
+        String[] soundResourceTitles = new String[]{DEFAULT_POSITIVE_TITLE, DEFAULT_NEGATIVE_TITLE};
+
+        for (int i = 0; i < soundResourceIds.length; i++) {
+            byte[] buffer = null;
+
+            try {
+                InputStream in = getContext().getResources().openRawResource(soundResourceIds[i]);
+                int size = in.available();
+                buffer = new byte[size];
+                in.read(buffer);
+                in.close();
+            } catch (IOException e) {
+                Log.e(this.getClass().getName(), e.getLocalizedMessage());
+            }
+
+            String filename = soundResourceTitles[i] + ".m4a";
+
+            boolean exists = (new File(SD_CARD_RINGTONE_PATH)).exists();
+            if (!exists) {
+                new File(SD_CARD_RINGTONE_PATH).mkdirs();
+            }
+
+            try {
+                File file = new File(SD_CARD_RINGTONE_PATH + filename);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileOutputStream out = new FileOutputStream(file);
+                out.write(buffer);
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                Log.e(this.getClass().getName(), e.getLocalizedMessage());
+            } catch (IOException e) {
+                Log.e(this.getClass().getName(), e.getLocalizedMessage());
+            }
+
+            getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + SD_CARD_RINGTONE_PATH + filename)));
+
+            File k = new File(SD_CARD_RINGTONE_PATH, filename);
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DATA, k.getAbsolutePath());
+            values.put(MediaStore.MediaColumns.TITLE, soundResourceTitles[i]);
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/m4a");
+            values.put(MediaStore.Audio.Media.ARTIST, "okno ");
+            values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+            values.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
+            values.put(MediaStore.Audio.Media.IS_ALARM, false);
+            values.put(MediaStore.Audio.Media.IS_MUSIC, false);
+
+            getContext().getContentResolver().insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), values);
+        }
     }
 }

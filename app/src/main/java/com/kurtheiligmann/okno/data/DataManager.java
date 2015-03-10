@@ -10,13 +10,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.kurtheiligmann.okno.R;
+import com.kurtheiligmann.okno.media.MediaManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by kurtheiligmann on 2/9/15.
- */
 public class DataManager extends SQLiteOpenHelper {
     public static final String PREFS_NAME = "com.kurtheiligmann.okno.data.prefs";
 
@@ -24,23 +22,13 @@ public class DataManager extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private static final String ENABLED_KEY = "com.kurtheiligmann.okno.data.enabledKey";
-    private static final String DEFAULT_POSITIVE_TITLE = "OkYes";
-    private static final String DEFAULT_POSITIVE_SOUND = "android.resource://com.kurtheiligmann.okno/raw/two_tone";
-    private static final String DEFAULT_NEGATIVE_TITLE = "OkNo";
-    private static final String DEFAULT_NEGATIVE_SOUND = "android.resource://com.kurtheiligmann.okno/raw/no_tone";
+    private static final String FIRST_RUN_KEY = "com.kurtheiligmann.okno.data.firstRunKey";
 
-    private static final String CREATE_TONE_TABLE =
-            "CREATE TABLE " + Tone.TABLE_NAME + "(" +
-                    Tone.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    Tone.COLUMN_TITLE + " TEXT NOT NULL UNIQUE," +
-                    Tone.COLUMN_FILE_ADDRESS + " TEXT NOT NULL" +
-                    ");";
     private static final String CREATE_MESSAGE_TABLE =
             "CREATE TABLE " + Message.TABLE_NAME + "(" +
                     Message.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     Message.COLUMN_BODY + " TEXT NOT NULL UNIQUE," +
-                    Message.COLUMN_TONE_ID + " INTEGER," +
-                    "FOREIGN KEY(" + Message.COLUMN_TONE_ID + ") REFERENCES " + Tone.TABLE_NAME + "(" + Tone.COLUMN_ID + ")" +
+                    Message.COLUMN_RINGTONE_NAME + " TEXT NOT NULL" +
                     ");";
 
     private Context context;
@@ -49,17 +37,26 @@ public class DataManager extends SQLiteOpenHelper {
     public DataManager(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         setContext(context);
+        if (isFirstRun()) {
+            doInitialSetup();
+        }
         setDatabase(getWritableDatabase());
     }
 
+    private void doInitialSetup() {
+        MediaManager mediaManager = new MediaManager(getContext());
+        mediaManager.createOkNoRingtones();
+        isFirstRun(false);
+    }
+
     public void close() {
-        database.close();
+        if (getDatabase() != null) {
+            getDatabase().close();
+        }
     }
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        Log.i(this.getClass().getName(), CREATE_TONE_TABLE);
-        database.execSQL(CREATE_TONE_TABLE);
         Log.i(this.getClass().getName(), CREATE_MESSAGE_TABLE);
         database.execSQL(CREATE_MESSAGE_TABLE);
         setDatabase(database);
@@ -72,7 +69,6 @@ public class DataManager extends SQLiteOpenHelper {
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + Message.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + Tone.TABLE_NAME);
         onCreate(db);
     }
 
@@ -88,26 +84,28 @@ public class DataManager extends SQLiteOpenHelper {
         return sharedPreferences.getBoolean(ENABLED_KEY, true);
     }
 
+    private void isFirstRun(boolean isFirstRun) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(FIRST_RUN_KEY, isFirstRun);
+        editor.apply();
+    }
+
+    private boolean isFirstRun() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(FIRST_RUN_KEY, true);
+    }
+
     private void initDefaultSounds(Context context) {
         String[] defaultPositiveValues = context.getResources().getStringArray(R.array.default_positive_values);
         for (String defaultPositiveValue : defaultPositiveValues) {
-            Tone tone = getTone(DEFAULT_POSITIVE_TITLE);
-            if (tone == null) {
-                tone = new Tone(DEFAULT_POSITIVE_TITLE, DEFAULT_POSITIVE_SOUND);
-                saveTone(tone);
-            }
-            Message message = new Message(defaultPositiveValue, tone);
+            Message message = Message.getInstance(defaultPositiveValue, MediaManager.DEFAULT_POSITIVE_TITLE);
             saveMessage(message);
         }
 
         String[] defaultNegativeValues = context.getResources().getStringArray(R.array.default_negative_values);
         for (String defaultNegativeValue : defaultNegativeValues) {
-            Tone tone = getTone(DEFAULT_NEGATIVE_TITLE);
-            if (tone == null) {
-                tone = new Tone("OkNo", DEFAULT_NEGATIVE_SOUND);
-                saveTone(tone);
-            }
-            Message message = new Message(defaultNegativeValue, tone);
+            Message message = Message.getInstance(defaultNegativeValue, MediaManager.DEFAULT_NEGATIVE_TITLE);
             saveMessage(message);
         }
     }
@@ -118,7 +116,7 @@ public class DataManager extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Message message = new Message(cursor, getTone(cursor.getLong(2)));
+            Message message = Message.getInstance(cursor);
             existingMessages.add(message);
             cursor.moveToNext();
         }
@@ -127,41 +125,13 @@ public class DataManager extends SQLiteOpenHelper {
         return existingMessages;
     }
 
-    public Tone getTone(long toneId) {
-        Tone tone = null;
-        try {
-            Cursor cursor = getDatabase().query(Tone.TABLE_NAME, Tone.ALL_COLUMNS, Tone.COLUMN_ID + "=" + toneId, null, null, null, null);
-
-            cursor.moveToFirst();
-            if (cursor.getCount() > 1) {
-                throw new SQLiteException("Tone id matches more than one record");
-            } else if (cursor.getCount() == 1) {
-                tone = new Tone(cursor);
-            }
-            cursor.close();
-        } catch (SQLiteException e) {
-            Log.e(this.getClass().getName(), e.getLocalizedMessage());
-        }
-        return tone;
-    }
-
-    public Tone getTone(String title) {
-        Tone tone = null;
-        Cursor cursor = getDatabase().query(Tone.TABLE_NAME, Tone.ALL_COLUMNS, Tone.COLUMN_TITLE + "=?", new String[]{title}, null, null, null);
-        if (cursor.getCount() == 1) {
-            cursor.moveToFirst();
-            tone = new Tone(cursor);
-        }
-        cursor.close();
-        return tone;
-    }
 
     public Message getMessage(long messageId) {
         Message message = null;
         try {
             Cursor cursor = getDatabase().query(Message.TABLE_NAME, Message.ALL_COLUMNS, Message.COLUMN_ID + "=" + messageId, null, null, null, null);
             cursor.moveToFirst();
-            message = new Message(cursor, getTone(cursor.getLong(2)));
+            message = Message.getInstance(cursor);
             cursor.close();
         } catch (SQLiteException e) {
             Log.e(this.getClass().getName(), e.getLocalizedMessage());
@@ -170,19 +140,10 @@ public class DataManager extends SQLiteOpenHelper {
         return message;
     }
 
-//    private Message messageFromCursor(Cursor cursor) {
-//        long messageId = cursor.getLong(0);
-//        String body = cursor.getString(1);
-//        Tone tone = getTone(cursor.getInt(2));
-//        Message message = new Message(messageId, body, tone);
-//
-//        return message;
-//    }
-
     public void saveMessage(Message message) {
         ContentValues values = new ContentValues();
         values.put(Message.COLUMN_BODY, message.getBody());
-        values.put(Message.COLUMN_TONE_ID, message.getTone().getId());
+        values.put(Message.COLUMN_RINGTONE_NAME, message.getRingtoneName());
 
         if (message.getId() == -1 || getMessage(message.getId()) == null) {
             //save message
@@ -193,27 +154,13 @@ public class DataManager extends SQLiteOpenHelper {
         }
     }
 
-    private void saveTone(Tone tone) {
-        ContentValues toneValues = new ContentValues();
-        toneValues.put(Tone.COLUMN_TITLE, tone.getTitle());
-        toneValues.put(Tone.COLUMN_FILE_ADDRESS, tone.getFileAddress());
-
-        if (tone.getId() == -1 || getTone(tone.getId()) == null) {
-            //save tone
-            tone.setId(getDatabase().insert(Tone.TABLE_NAME, null, toneValues));
-        } else {
-            //update tone
-            getDatabase().update(Tone.TABLE_NAME, toneValues, Tone.COLUMN_ID + "=?", new String[]{tone.getId() + ""});
-        }
-    }
-
     public Message getMessageWithBody(String body) {
         Message message = null;
 
-        Cursor cursor = getDatabase().query(Message.TABLE_NAME, Message.ALL_COLUMNS, Message.COLUMN_BODY+ "=?", new String[]{body}, null, null, null);
+        Cursor cursor = getDatabase().query(Message.TABLE_NAME, Message.ALL_COLUMNS, Message.COLUMN_BODY + "=?", new String[]{body}, null, null, null);
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
-            message = new Message(cursor, getTone(cursor.getLong(2)));
+            message = Message.getInstance(cursor);
         }
         cursor.close();
         return message;
@@ -221,18 +168,6 @@ public class DataManager extends SQLiteOpenHelper {
 
     public void deleteMessage(Message message) {
         getDatabase().delete(Message.TABLE_NAME, Message.COLUMN_ID + "=?", new String[]{message.getId() + ""});
-        deleteToneIfUnused(message.getTone());
-    }
-
-    public void deleteTone(Tone tone) {
-        getDatabase().delete(Tone.TABLE_NAME, Tone.COLUMN_ID + "=?", new String[]{tone.getId() + ""});
-    }
-
-    private void deleteToneIfUnused(Tone tone) {
-        Cursor cursor = getDatabase().query(Message.TABLE_NAME, new String[]{Message.COLUMN_ID}, Message.COLUMN_TONE_ID + "=?", new String[]{tone.getId() + ""}, null, null, null);
-        if (cursor.getCount() == 0) {
-            deleteTone(tone);
-        }
     }
 
     private Context getContext() {
