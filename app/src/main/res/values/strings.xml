@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">OkNo</string>
+
+    <string-array name="default_positive_values">
+        <item>y</item>
+        <item>yes</item>
+        <item>ok</item>
+        <item>okay</item>
+        <item>k</item>
+        <item>kk</item>
+    </string-array>
+
+    <string-array name="default_negative_values">
+        <item>n</item>
+        <item>no</item>
+        <item>nope</item>
+    </string-array>
+
+    <string name="title_activity_settings">OkNo Settings</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="edit_menu_title">Edit</string>
+    <string name="delete_menu_title">Delete</string>
+
+    <string name="edit_message_hint">Message text here...</string>
+    <string name="edit_tone_hint">Select a tone...</string>
+    <string name="save_button_text">Save</string>
+
 </resources>
