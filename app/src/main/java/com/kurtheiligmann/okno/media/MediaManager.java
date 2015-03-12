@@ -3,16 +3,19 @@ package com.kurtheiligmann.okno.media;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.data.DataManager;
 import com.kurtheiligmann.okno.data.Message;
+import com.kurtheiligmann.okno.data.OkNoTone;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,15 +49,33 @@ public class MediaManager {
         Message message = dataManager.getMessageWithBody(messageBody.toLowerCase());
         dataManager.close();
         if (message != null) {
-            Ringtone ringtone = getRingtoneForName(message.getRingtoneName());
-            if (ringtone != null) {
-                ringtone.play();
+            final OkNoTone tone = getRingtoneForName(message.getRingtoneName());
+            if (tone != null) {
+                Log.i(this.getClass().getName(), tone.toString());
+                MediaPlayer player = new MediaPlayer();
+                int duration = 1500;
+                try {
+                    player.setDataSource(getContext(), tone.getUri());
+                    player.prepare();
+                    duration = player.getDuration();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                tone.getRingtone().play();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tone.getRingtone().stop();
+                    }
+                }, duration);
             }
+
         }
     }
 
-    public List<Ringtone> getAllTones() {
-        ArrayList<Ringtone> tones = new ArrayList<>();
+    public List<OkNoTone> getAllTones() {
+        ArrayList<OkNoTone> tones = new ArrayList<>();
         RingtoneManager ringtoneManager = new RingtoneManager(getContext());
         ringtoneManager.setType(RingtoneManager.TYPE_ALL);
 
@@ -62,23 +83,23 @@ public class MediaManager {
         for (int i = 0; i < numberOfRingtones; i++) {
             Ringtone ringtone = ringtoneManager.getRingtone(i);
             Log.i(this.getClass().toString(), ringtoneManager.getRingtoneUri(i).toString());
-            tones.add(ringtone);
+            tones.add(OkNoTone.getInstance(ringtone, ringtone.getTitle(getContext()), ringtoneManager.getRingtoneUri(i)));
         }
 
         return tones;
     }
 
-    public Ringtone getRingtoneForName(String name) {
-        Ringtone foundRingtone = null;
-        Ringtone defaultRingtone = null;
-        List<Ringtone> allTones = getAllTones();
-        for (Ringtone ringtone : allTones) {
-            String ringtoneTitle = ringtone.getTitle(getContext());
+    public OkNoTone getRingtoneForName(String name) {
+        OkNoTone foundRingtone = null;
+        OkNoTone defaultRingtone = null;
+        List<OkNoTone> allTones = getAllTones();
+        for (OkNoTone tone : allTones) {
+            String ringtoneTitle = tone.getName();
             if (ringtoneTitle.equals(name)) {
-                foundRingtone = ringtone;
+                foundRingtone = tone;
                 break;
             } else if (ringtoneTitle.equals(DEFAULT_POSITIVE_TITLE)) {
-                defaultRingtone = ringtone;
+                defaultRingtone = tone;
             }
         }
 

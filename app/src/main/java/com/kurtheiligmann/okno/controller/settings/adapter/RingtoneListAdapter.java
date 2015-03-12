@@ -1,35 +1,30 @@
 package com.kurtheiligmann.okno.controller.settings.adapter;
 
 import android.content.Context;
-import android.media.Ringtone;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.kurtheiligmann.okno.R;
+import com.kurtheiligmann.okno.data.OkNoTone;
 
 import java.util.List;
 
-public class RingtoneListAdapter extends ArrayAdapter<Ringtone> {
-    private final Context context;
-    private Ringtone selectedTone;
+public class RingtoneListAdapter extends ArrayAdapter<OkNoTone> {
 
-    public RingtoneListAdapter(Context context, int resource, Ringtone tone, List<Ringtone> tones) {
+    public RingtoneListAdapter(Context context, int resource, List<OkNoTone> tones) {
         super(context, resource);
-        this.context = context;
-        this.selectedTone = tone;
-        this.addAll(tones);
+        addAll(tones);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
+        LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        Ringtone tone = getItem(position);
+        OkNoTone tone = getItem(position);
 
         View rowView = convertView;
 
@@ -38,11 +33,7 @@ public class RingtoneListAdapter extends ArrayAdapter<Ringtone> {
         }
 
         TextView ringtoneTitleTextView = (TextView) rowView.findViewById(R.id.ringtone_title);
-        ringtoneTitleTextView.setText(tone.getTitle(getContext()));
-
-        CheckBox ringtoneSelectedCheckBox = (CheckBox) rowView.findViewById(R.id.ringtone_selected);
-        ringtoneSelectedCheckBox.setChecked(tone == selectedTone);
-
+        ringtoneTitleTextView.setText(tone.getName());
         return rowView;
     }
 }
