@@ -126,6 +126,8 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
             public void onClick(View v) {
                 hideSoftKeyboard();
 
+                bodyText.clearFocus();
+
                 popupWindow = new ListPopupWindow(getActivity());
                 popupWindow.setAnchorView(toneText);
                 popupWindow.setModal(true);
