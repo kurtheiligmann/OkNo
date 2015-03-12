@@ -5,11 +5,13 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -40,6 +42,24 @@ public class SettingsFragment extends Fragment {
         final ListView messagesList = (ListView) rootView.findViewById(R.id.messages_list);
         registerForContextMenu(messagesList);
 
+        messagesList.setOverScrollMode(AbsListView.OVER_SCROLL_ALWAYS);
+        messagesList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            int previousFirstVisibleItem;
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem > previousFirstVisibleItem) {
+                    hideAddButton();
+                } else {
+                    showAddButton();
+                }
+            }
+        });
 
         CheckBox enabledCheckBox = (CheckBox) rootView.findViewById(R.id.enabled_checkbox);
         enabledCheckBox.setChecked(dataManager.getEnabled());
@@ -65,6 +85,15 @@ public class SettingsFragment extends Fragment {
         dataManager.close();
         return rootView;
     }
+
+    private void hideAddButton() {
+        Log.i(getClass().getName(), "hideAddButton");
+    }
+
+    private void showAddButton() {
+        Log.i(getClass().getName(), "showAddButton");
+    }
+
 
     private void showNewMessageView() {
         showEditMessage(null);
