@@ -3,6 +3,7 @@ package com.kurtheiligmann.okno.controller.settings.fragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -45,11 +47,14 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 dataManager.saveEnabled(isChecked);
-                if (isChecked) {
-                    populateMessageList(dataManager.getAllMessages(), messagesList);
-                } else {
-//                    populateMessageList(new ArrayList<Message>(), (ListView) rootView.findViewById(R.id.messages_list));
-                }
+            }
+        });
+
+        Button newMessageButton = (Button) rootView.findViewById(R.id.new_message_button);
+        newMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNewMessageView();
             }
         });
 
@@ -59,6 +64,10 @@ public class SettingsFragment extends Fragment {
 
         dataManager.close();
         return rootView;
+    }
+
+    private void showNewMessageView() {
+        showEditMessage(null);
     }
 
     private void populateMessageList(List<Message> messages, ListView messageList) {

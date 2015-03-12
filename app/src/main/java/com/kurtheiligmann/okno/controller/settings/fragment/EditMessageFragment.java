@@ -1,10 +1,14 @@
 package com.kurtheiligmann.okno.controller.settings.fragment;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +33,8 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
     private List<OkNoTone> tones;
 
     private TextView toneText;
+    private TextView bodyText;
+    private Button saveButton;
     private ListPopupWindow popupWindow;
 
     public EditMessageFragment() {
@@ -36,9 +42,11 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
 
     public static EditMessageFragment newInstance(Message message) {
         EditMessageFragment fragment = new EditMessageFragment();
-        Bundle args = new Bundle();
-        args.putString(MESSAGE_ARG_KEY, message.getBody());
-        fragment.setArguments(args);
+        if (message != null) {
+            Bundle args = new Bundle();
+            args.putString(MESSAGE_ARG_KEY, message.getBody());
+            fragment.setArguments(args);
+        }
         return fragment;
     }
 
@@ -67,10 +75,13 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MediaManager mediaManager = new MediaManager(getActivity());
+        setTones(mediaManager.getAllTones());
+
         if (getArguments() != null) {
 
             String messageBody = getArguments().getString(MESSAGE_ARG_KEY);
-            MediaManager mediaManager = new MediaManager(getActivity());
             if (messageBody != null && getMessage() == null) {
                 DataManager dataManager = new DataManager(getActivity());
                 setMessage(dataManager.getMessageWithBody(messageBody));
@@ -83,8 +94,6 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
                     getMessage().setRingtoneName(ringtoneName);
                 }
             }
-
-            setTones(mediaManager.getAllTones());
         }
     }
 
@@ -93,12 +102,30 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_edit_message, container, false);
 
-        final EditText bodyText = (EditText) view.findViewById(R.id.message_body);
+        bodyText = (EditText) view.findViewById(R.id.message_body);
+        bodyText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validateFields();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         toneText = (TextView) view.findViewById(R.id.message_tone);
         toneText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftKeyboard();
+
                 popupWindow = new ListPopupWindow(getActivity());
                 popupWindow.setAnchorView(toneText);
                 popupWindow.setModal(true);
@@ -113,10 +140,12 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
             }
         });
 
-        Button saveButton = (Button) view.findViewById(R.id.save_button);
+        saveButton = (Button) view.findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftKeyboard();
+
                 getMessage().setBody(bodyText.getText().toString());
 
                 DataManager dataManager = new DataManager(getActivity());
@@ -127,11 +156,21 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
             }
         });
 
+        if (getMessage() == null) {
+            setMessage(Message.getInstance("", ""));
+            saveButton.setEnabled(false);
+        }
+
         Message message = getMessage();
 
         if (message != null) {
-            bodyText.setText(message.getBody());
-            toneText.setText(message.getRingtoneName());
+            if (message.getBody().length() > 0) {
+                bodyText.setText(message.getBody());
+            }
+
+            if (message.getRingtoneName().length() > 0) {
+                toneText.setText(message.getRingtoneName());
+            }
         }
 
         return view;
@@ -144,8 +183,22 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
         OkNoTone selectedTone = getTones().get(position);
         String toneName = selectedTone.getName();
 
-        getMessage().setRingtoneName(toneName);
+        if (getMessage() != null) {
+            getMessage().setRingtoneName(toneName);
+        }
         toneText.setText(toneName);
 
+        validateFields();
+    }
+
+    private void validateFields() {
+        saveButton.setEnabled(toneText.getText().length() > 0 && bodyText.getText().length() > 0);
+    }
+
+    private void hideSoftKeyboard(){
+        if(getActivity().getCurrentFocus()!=null && getActivity().getCurrentFocus() instanceof EditText){
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(bodyText.getWindowToken(), 0);
+        }
     }
 }
