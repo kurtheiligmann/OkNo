@@ -2,6 +2,7 @@ package com.kurtheiligmann.okno.controller.settings.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -133,7 +134,7 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
                 popupWindow.setModal(true);
                 popupWindow.setOnItemClickListener(EditMessageFragment.this);
                 popupWindow.setWidth((int) (view.getWidth() * .90));
-                popupWindow.setHeight((int) (view.getHeight() * .90));
+                popupWindow.setHeight(isLandscape() ? (int) (view.getHeight() * .5) : popupWindow.getWidth());
 
                 RingtoneListAdapter ringtoneAdapter = new RingtoneListAdapter(getActivity(), R.layout.ringtone_list_item, getTones());
                 popupWindow.setAdapter(ringtoneAdapter);
@@ -197,10 +198,14 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
         saveButton.setEnabled(toneText.getText().length() > 0 && bodyText.getText().length() > 0);
     }
 
-    private void hideSoftKeyboard(){
-        if(getActivity().getCurrentFocus()!=null && getActivity().getCurrentFocus() instanceof EditText){
-            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+    private void hideSoftKeyboard() {
+        if (getActivity().getCurrentFocus() != null && getActivity().getCurrentFocus() instanceof EditText) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(bodyText.getWindowToken(), 0);
         }
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 }
