@@ -133,7 +133,7 @@ public class EditMessageFragment extends Fragment implements AdapterView.OnItemC
                 popupWindow.setModal(true);
                 popupWindow.setOnItemClickListener(EditMessageFragment.this);
                 popupWindow.setWidth((int) (view.getWidth() * .90));
-                popupWindow.setHeight((int) (view.getHeight() * .90));
+                popupWindow.setHeight(popupWindow.getWidth());
 
                 RingtoneListAdapter ringtoneAdapter = new RingtoneListAdapter(getActivity(), R.layout.ringtone_list_item, getTones());
                 popupWindow.setAdapter(ringtoneAdapter);
