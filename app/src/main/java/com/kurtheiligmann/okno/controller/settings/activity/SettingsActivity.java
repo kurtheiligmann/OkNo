@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 import com.kurtheiligmann.okno.R;
 import com.kurtheiligmann.okno.controller.settings.fragment.SettingsFragment;
+import com.kurtheiligmann.okno.media.MediaManager;
 
 public class SettingsActivity extends ActionBarActivity {
 
@@ -18,6 +19,13 @@ public class SettingsActivity extends ActionBarActivity {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new SettingsFragment())
                     .commit();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new MediaManager(SettingsActivity.this).getAllTones();
+                }
+            }).start();
         }
     }
 
