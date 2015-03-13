@@ -55,23 +55,37 @@ public class MediaManager {
             final OkNoTone tone = getRingtoneForName(message.getRingtoneName());
             if (tone != null) {
                 Log.i(this.getClass().getName(), tone.toString());
-                MediaPlayer player = new MediaPlayer();
                 int duration = 1500;
+                int defaultToneDuration = 1500;
+
                 try {
+                    MediaPlayer player = new MediaPlayer();
                     player.setDataSource(getContext(), tone.getUri());
                     player.prepare();
                     duration = player.getDuration();
+
+                    player = new MediaPlayer();
+                    Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_NOTIFICATION);
+                    player.setDataSource(getContext(), defaultRingtoneUri);
+                    player.prepare();
+                    defaultToneDuration = player.getDuration();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                tone.getRingtone().play();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tone.getRingtone().play();
+                    }
+                }, defaultToneDuration);
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         tone.getRingtone().stop();
                     }
-                }, duration);
+                }, duration + defaultToneDuration);
             }
 
         }
