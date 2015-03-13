@@ -54,7 +54,6 @@ public class MediaManager {
         if (message != null) {
             final OkNoTone tone = getRingtoneForName(message.getRingtoneName());
             if (tone != null) {
-                Log.i(this.getClass().getName(), tone.toString());
                 int duration = 1500;
                 int defaultToneDuration = 1500;
 
@@ -101,7 +100,6 @@ public class MediaManager {
             int numberOfRingtones = ringtoneManager.getCursor().getCount();
             for (int i = 0; i < numberOfRingtones; i++) {
                 Ringtone ringtone = ringtoneManager.getRingtone(i);
-                Log.i(this.getClass().toString(), ringtoneManager.getRingtoneUri(i).toString());
                 allTones.add(OkNoTone.getInstance(ringtone, ringtone.getTitle(getContext()), ringtoneManager.getRingtoneUri(i)));
             }
         }
