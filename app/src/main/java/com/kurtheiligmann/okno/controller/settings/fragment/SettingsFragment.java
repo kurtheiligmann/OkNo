@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -26,6 +27,8 @@ import java.util.List;
 public class SettingsFragment extends Fragment {
 
     private MessageListAdapter messageListAdapter;
+    private Button newMessageButton;
+    private View rootView;
 
     public SettingsFragment() {
     }
@@ -33,13 +36,30 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
+        rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
         final DataManager dataManager = new DataManager(getActivity());
 
         final ListView messagesList = (ListView) rootView.findViewById(R.id.messages_list);
         registerForContextMenu(messagesList);
+        messagesList.setOverScrollMode(AbsListView.OVER_SCROLL_ALWAYS);
+        messagesList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            int previousFirstVisibleItem;
 
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem > previousFirstVisibleItem) {
+                    hideAddButton();
+                } else {
+                    showAddButton();
+                }
+            }
+        });
 
         CheckBox enabledCheckBox = (CheckBox) rootView.findViewById(R.id.enabled_checkbox);
         enabledCheckBox.setChecked(dataManager.getEnabled());
@@ -50,7 +70,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        Button newMessageButton = (Button) rootView.findViewById(R.id.new_message_button);
+        newMessageButton = (Button) rootView.findViewById(R.id.new_message_button);
         newMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,6 +84,18 @@ public class SettingsFragment extends Fragment {
 
         dataManager.close();
         return rootView;
+    }
+
+    private void hideAddButton() {
+        if (newMessageButton != null) {
+            newMessageButton.animate().y(rootView.getHeight());
+        }
+    }
+
+    private void showAddButton() {
+        if (newMessageButton != null) {
+            newMessageButton.animate().y(rootView.getHeight() - newMessageButton.getHeight());
+        }
     }
 
     private void showNewMessageView() {

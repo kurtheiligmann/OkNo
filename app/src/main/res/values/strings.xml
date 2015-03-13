@@ -8,6 +8,8 @@
         <item>okay</item>
         <item>k</item>
         <item>kk</item>
+        <item>thanks</item>
+        <item>ty</item>
     </string-array>
 
     <string-array name="default_negative_values">
