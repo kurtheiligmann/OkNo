@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MediaManager {
@@ -31,6 +32,8 @@ public class MediaManager {
     public static final String DEFAULT_NEGATIVE_TITLE = "OkNo";
     private static final String SD_CARD_RINGTONE_PATH = Environment.getExternalStorageDirectory().getPath() + "/media/audio/ringtones/";
     private Context context;
+    private static List<OkNoTone> allTones;
+
 
     public MediaManager(Context context) {
         setContext(context);
@@ -75,18 +78,21 @@ public class MediaManager {
     }
 
     public List<OkNoTone> getAllTones() {
-        ArrayList<OkNoTone> tones = new ArrayList<>();
-        RingtoneManager ringtoneManager = new RingtoneManager(getContext());
-        ringtoneManager.setType(RingtoneManager.TYPE_ALL);
+        if (allTones == null) {
+            allTones = Collections.synchronizedList(new ArrayList<OkNoTone>());
 
-        int numberOfRingtones = ringtoneManager.getCursor().getCount();
-        for (int i = 0; i < numberOfRingtones; i++) {
-            Ringtone ringtone = ringtoneManager.getRingtone(i);
-            Log.i(this.getClass().toString(), ringtoneManager.getRingtoneUri(i).toString());
-            tones.add(OkNoTone.getInstance(ringtone, ringtone.getTitle(getContext()), ringtoneManager.getRingtoneUri(i)));
+            RingtoneManager ringtoneManager = new RingtoneManager(getContext());
+            ringtoneManager.setType(RingtoneManager.TYPE_ALL);
+
+            int numberOfRingtones = ringtoneManager.getCursor().getCount();
+            for (int i = 0; i < numberOfRingtones; i++) {
+                Ringtone ringtone = ringtoneManager.getRingtone(i);
+                Log.i(this.getClass().toString(), ringtoneManager.getRingtoneUri(i).toString());
+                allTones.add(OkNoTone.getInstance(ringtone, ringtone.getTitle(getContext()), ringtoneManager.getRingtoneUri(i)));
+            }
         }
 
-        return tones;
+        return allTones;
     }
 
     public OkNoTone getRingtoneForName(String name) {
