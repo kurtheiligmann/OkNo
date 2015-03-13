@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.kurtheiligmann.okno">
+    package="com.kurtheiligmann.okno"
+    android:versionCode="1"
+    android:versionName="1.0">
 
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -35,10 +37,6 @@
             </intent-filter>
         </receiver>
 
-        <!--<activity-->
-        <!--android:name=".activity.SettingsActivity"-->
-        <!--android:label="@string/title_activity_settings" >-->
-        <!--</activity>-->
     </application>
 
 </manifest>
