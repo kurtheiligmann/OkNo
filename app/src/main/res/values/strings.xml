@@ -20,6 +20,7 @@
 
     <string name="title_activity_settings">OkNo Settings</string>
     <string name="action_settings">Settings</string>
+    <string name="pref_title_enable_okno">Enable OkNo</string>
 
     <string name="edit_menu_title">Edit</string>
     <string name="delete_menu_title">Delete</string>
